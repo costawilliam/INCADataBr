@@ -1,12 +1,12 @@
-numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
+numeroCasosPorSexoPizza <- function(dfDados, ...) {
   params = list(...)
 
   if (is.null(params$titleGraphic)) {
-    params$titleGraphic <- "Número de casos por consumo de tabaco"
+    params$titleGraphic <- "Número de casos por sexo"
   }
 
   if (is.null(params$titleX)) {
-    params$titleX <- "Tipo consumo"
+    params$titleX <- "Idade"
   }
 
   if (is.null(params$titleY)) {
@@ -53,25 +53,20 @@ numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
   library(plotly)
 
   df <-
-    aggregate(data.frame(NroCasos = dfDados$TABAGISM),
-              list(TABAGISM = dfDados$TABAGISM),
+    aggregate(data.frame(Quantidade = dfDados$SEXO),
+              list(SEXO = dfDados$SEXO),
               length)
 
-  df$TABAGISM <- converterFatorParaInteiro(df$TABAGISM)
-
-  df$TABAGISM[df$TABAGISM == 1] <- "Nunca"
-  df$TABAGISM[df$TABAGISM == 2] <- "Ex-consumidor"
-  df$TABAGISM[df$TABAGISM == 3] <- "Sim"
-  df$TABAGISM[df$TABAGISM == 4] <- "Não avaliado"
-  df$TABAGISM[df$TABAGISM == 8] <- "Não se aplica"
-  df$TABAGISM[df$TABAGISM == 9] <- "Sem informação"
+  df$SEXO <- converterFatorParaInteiro(df$SEXO)
+  df$SEXO[df$SEXO == 1] <- "Masculino"
+  df$SEXO[df$SEXO == 2] <- "Feminino"
 
   if (params$type == "bar") {
     p <-
       plot_ly(
         df,
-        x = ~ df$TABAGISM,
-        y = ~ df$NroCasos,
+        x = ~ df$SEXO,
+        y = ~ df$Quantidade,
         type = params$type
       ) %>%
       layout(
@@ -79,44 +74,42 @@ numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
         xaxis = list(title = params$titleX),
         yaxis = list(title =  params$titleY)
       )
-
     p
-  }  else if (params$type == "pie") {
+  } else if (params$type == "pie") {
     df["FREQUENCIA"] <- NA
 
     for (i in c(1:nrow(df))) {
-      df$FREQUENCIA[i] = calcularPercentual(nrow(dfDados), df$NroCasos[i])
+      df$FREQUENCIA[i] = calcularPercentual(nrow(dfDados), df$Quantidade[i])
     }
 
-    params$colors <-
+    colors <-
       c(
         'rgb(211,94,96)',
         'rgb(128,133,133)',
         'rgb(144,103,167)',
         'rgb(171,104,87)',
-        'rgb(114,147,203)',
-        'rgb(0,0,0)'
+        'rgb(114,147,203)'
       )
+
     p <-
       plot_ly(
         df,
-        labels = ~ df$TABAGISM,
+        labels = ~ df$SEXO,
         values = ~ df$FREQUENCIA,
         type = 'pie',
         textposition = 'inside',
         textinfo = 'label+percent',
         insidetextfont = list(color = '#FFFFFF'),
         hoverinfo = 'text',
-        text = ~ paste(df$TABAGISM, ' - ', df$FREQUENCIA, '%'),
+        text = ~ paste(df$SEXO, ' - ', df$FREQUENCIA, '%'),
         marker = list(
-          colors = params$colors,
+          colors = colors,
           line = list(color = '#FFFFFF', width = 1)
         ),
-        #The 'pull' attribute can also be used to create space between the sectors
         showlegend = TRUE
       ) %>%
       layout(
-        title = 'Percentual de casos por tipo de consumo de tabaco',
+        title = 'Percentual de casos por Sexo',
         xaxis = list(
           showgrid = FALSE,
           zeroline = FALSE,
@@ -129,7 +122,6 @@ numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
         )
       )
     p
-
   } else {
     message("Tipo de gráfico não indicado não é suportado por esta função")
     message("Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")

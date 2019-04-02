@@ -1,5 +1,54 @@
-numeroCasosLocalizacaoPrimaria <- function(dfDados){
-  library(ggplot2)
+numeroCasosPorLocalizacaoPrimaria <- function(dfDados, ...){
+  params = list(...)
+
+  if (is.null(params$titleGraphic)) {
+    params$titleGraphic <- "Número de casos por Localização primária"
+  }
+
+  if (is.null(params$titleX)) {
+    params$titleX <- "Localização"
+  }
+
+  if (is.null(params$titleY)) {
+    params$titleY <- "Número de casos"
+  }
+
+  if (is.null(params$type)) {
+    params$type <- "bar"
+  }
+
+  if (is.null(params$colors)) {
+    params$colors <-
+      colors <-
+      c(
+        'rgb(0,0,0)',
+        'rgb(128,0,0)',
+        'rgb(255,0,0)',
+        'rgb(255,255,0)',
+        'rgb(128,128,0)',
+        'rgb(255,0,255)',
+        'rgb(128,255,128)',
+        'rgb(255,255,128)',
+        'rgb(0,0,255)',
+        'rgb(0,128,0)',
+        'rgb(0,255,255)',
+        'rgb(0,255,0)',
+        'rgb(0,255,128)',
+        'rgb(128,255,255)',
+        'rgb(0,0,128)',
+        'rgb(128,0,128)',
+        'rgb(128,0,255)',
+        'rgb(128,128,128)',
+        'rgb(128,128,255)',
+        'rgb(0,128,128)',
+        'rgb(255,128,128)',
+        'rgb(255,0,128)',
+        'rgb(128,255,0)',
+        'rgb(0,128,255)',
+        'rgb(255,128,0)',
+        'rgb(255,128,255)'
+      )
+  }
 
   df<-aggregate(data.frame(NroCasos = dfDados$LOCTUDET), list(LOCTUDET = dfDados$LOCTUDET), length)
 
@@ -94,10 +143,72 @@ numeroCasosLocalizacaoPrimaria <- function(dfDados){
   df$LOCTUDET[df$LOCTUDET == "C96"] <- "C96 - Outras Neoplasias Malignas e as Não Especificadas Dos Tecidos Linfático, Hematopoético e Tecidos Correlatos"
   df$LOCTUDET[df$LOCTUDET == "C97"] <- "C97 - Neoplasias Malignas de Localizações Múltiplas Independentes (prC97rias)"
 
-  P <- ggplot(data=df, aes(x=LOCTUDET, y=NroCasos)) +
-    geom_bar(stat="identity")
 
-  P
+  library(plotly)
+
+  if (params$type == "bar") {
+  p <- plot_ly(df, x = ~df$LOCTUDET, y = ~df$NroCasos, type = 'bar', color = I("black")) %>%
+    layout(title = "título",
+           xaxis = list(title = ""),
+           yaxis = list(title = ""))
+
+  p
+
+  } else if(params$type == "pie") {
+    df["FREQUENCIA"] <- NA
+
+    for (i in c(1:nrow(df))) {
+      df$FREQUENCIA[i] = calcularPercentual(nrow(dfDados), df$NroCasos[i])
+    }
+
+    params$colors <-
+      c(
+        'rgb(211,94,96)',
+        'rgb(128,133,133)',
+        'rgb(144,103,167)',
+        'rgb(171,104,87)',
+        'rgb(114,147,203)',
+        'rgb(0,0,0)'
+      )
+    p <-
+      plot_ly(
+        df,
+        labels = ~ df$LOCTUDET,
+        values = ~ df$FREQUENCIA,
+        type = 'pie',
+        textposition = 'inside',
+        textinfo = 'label+percent',
+        insidetextfont = list(color = '#FFFFFF'),
+        hoverinfo = 'text',
+        text = ~ paste(df$LOCTUDET, ' - ', df$NroCasos, ' casos'),
+        marker = list(
+          colors = params$colors,
+          line = list(color = '#FFFFFF', width = 1)
+        ),
+        #The 'pull' attribute can also be used to create space between the sectors
+        showlegend = FALSE
+      ) %>%
+      layout(
+        title = params$titleGraphic,
+        xaxis = list(
+          showgrid = FALSE,
+          zeroline = FALSE,
+          showticklabels = FALSE
+        ),
+        yaxis = list(
+          showgrid = FALSE,
+          zeroline = FALSE,
+          showticklabels = FALSE
+        )
+      )
+    p
+  } else {
+    message("Tipo de gráfico não indicado não é suportado por esta função")
+    message("Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")
+  }
+
 }
 
-numeroCasosLocalizacaoPrimaria(dfDados)
+numeroCasosPorLocalizacaoPrimaria(dfDados, type="pie")
+
+
