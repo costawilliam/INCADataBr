@@ -1,54 +1,11 @@
+# tratarParametros
+# converterFatorParaCaracter
+# calcularPercentual
+
 numeroCasosPorLocalizacaoPrimaria <- function(dfDados, ...){
-  params = list(...)
+  library(plotly)
 
-  if (is.null(params$titleGraphic)) {
-    params$titleGraphic <- "Número de casos por Localização primária"
-  }
-
-  if (is.null(params$titleX)) {
-    params$titleX <- "Localização"
-  }
-
-  if (is.null(params$titleY)) {
-    params$titleY <- "Número de casos"
-  }
-
-  if (is.null(params$type)) {
-    params$type <- "bar"
-  }
-
-  if (is.null(params$colors)) {
-    params$colors <-
-      colors <-
-      c(
-        'rgb(0,0,0)',
-        'rgb(128,0,0)',
-        'rgb(255,0,0)',
-        'rgb(255,255,0)',
-        'rgb(128,128,0)',
-        'rgb(255,0,255)',
-        'rgb(128,255,128)',
-        'rgb(255,255,128)',
-        'rgb(0,0,255)',
-        'rgb(0,128,0)',
-        'rgb(0,255,255)',
-        'rgb(0,255,0)',
-        'rgb(0,255,128)',
-        'rgb(128,255,255)',
-        'rgb(0,0,128)',
-        'rgb(128,0,128)',
-        'rgb(128,0,255)',
-        'rgb(128,128,128)',
-        'rgb(128,128,255)',
-        'rgb(0,128,128)',
-        'rgb(255,128,128)',
-        'rgb(255,0,128)',
-        'rgb(128,255,0)',
-        'rgb(0,128,255)',
-        'rgb(255,128,0)',
-        'rgb(255,128,255)'
-      )
-  }
+  params <- tratarParametros(...)
 
   df<-aggregate(data.frame(NroCasos = dfDados$LOCTUDET), list(LOCTUDET = dfDados$LOCTUDET), length)
 
@@ -141,10 +98,7 @@ numeroCasosPorLocalizacaoPrimaria <- function(dfDados, ...){
   df$LOCTUDET[df$LOCTUDET == "C94"] <- "C94 - Outras Leucemias de Células de Tipo Especificado"
   df$LOCTUDET[df$LOCTUDET == "C95"] <- "C95 - Leucemia de Tipo Celular Não Especificado"
   df$LOCTUDET[df$LOCTUDET == "C96"] <- "C96 - Outras Neoplasias Malignas e as Não Especificadas Dos Tecidos Linfático, Hematopoético e Tecidos Correlatos"
-  df$LOCTUDET[df$LOCTUDET == "C97"] <- "C97 - Neoplasias Malignas de Localizações Múltiplas Independentes (prC97rias)"
-
-
-  library(plotly)
+  df$LOCTUDET[df$LOCTUDET == "C97"] <- "C97 - Neoplasias Malignas de Localizações Múltiplas Independentes (primárias)"
 
   if (params$type == "bar") {
   p <- plot_ly(df, x = ~df$LOCTUDET, y = ~df$NroCasos, type = 'bar', color = I("black")) %>%
@@ -208,7 +162,3 @@ numeroCasosPorLocalizacaoPrimaria <- function(dfDados, ...){
   }
 
 }
-
-numeroCasosPorLocalizacaoPrimaria(dfDados, type="pie")
-
-

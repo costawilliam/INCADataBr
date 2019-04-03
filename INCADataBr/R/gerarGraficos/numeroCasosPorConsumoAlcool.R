@@ -1,23 +1,7 @@
 numeroCasosPorConsumoAlcool <- function(dfDados, ...) {
-  params = list(...)
-
-  if (is.null(params$titleGraphic)) {
-    params$titleGraphic <- "Número de casos por consumo de Alcool"
-  }
-
-  if (is.null(params$titleX)) {
-    params$titleX <- "Tipo consumo"
-  }
-
-  if (is.null(params$titleY)) {
-    params$titleY <- "Número de casos"
-  }
-
-  if (is.null(params$type)) {
-    params$type <- "bar"
-  }
-
   library(plotly)
+
+  params <- tratarParametros(...)
 
   df <-
     aggregate(data.frame(NroCasos = dfDados$ALCOOLIS),
@@ -84,7 +68,7 @@ numeroCasosPorConsumoAlcool <- function(dfDados, ...) {
         showlegend = TRUE
       ) %>%
       layout(
-        title = params$titleGraphic,
+        title = params$title,
         xaxis = list(
           showgrid = FALSE,
           zeroline = FALSE,
