@@ -8,6 +8,8 @@ numeroCasosPorConsumoAlcool <- function(dfDados, ...) {
               list(ALCOOLIS = dfDados$ALCOOLIS),
               length)
 
+  df <- subset(df, df$ALCOOLIS != 0)
+
   df$ALCOOLIS <- converterFatorParaInteiro(df$ALCOOLIS)
 
   df$ALCOOLIS[df$ALCOOLIS == 1] <- "Nunca"
@@ -16,7 +18,7 @@ numeroCasosPorConsumoAlcool <- function(dfDados, ...) {
   df$ALCOOLIS[df$ALCOOLIS == 4] <- "Não avaliado"
   df$ALCOOLIS[df$ALCOOLIS == 8] <- "Não se aplica"
   df$ALCOOLIS[df$ALCOOLIS == 9] <- "Sem informação"
-  #df$ALCOOLIS[df$ALCOOLIS == 0] <- "Sem informação"
+
 
   if (params$type == "bar") {
     p <-
