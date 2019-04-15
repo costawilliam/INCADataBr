@@ -2,15 +2,15 @@ tratarParametros <- function (...) {
   params = list(...)
 
   if (is.null(params$title)) {
-    params$title <- "Número de casos por sexo"
+    params$title <- "Title here"
   }
 
   if (is.null(params$titleX)) {
-    params$titleX <- "Idade"
+    params$titleX <- "Axis X"
   }
 
   if (is.null(params$titleY)) {
-    params$titleY <- "Número de casos"
+    params$titleY <- "Axis Y"
   }
 
   if (is.null(params$type)) {

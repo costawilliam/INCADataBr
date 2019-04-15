@@ -1,3 +1,3 @@
-converterFatorParaCaracter <- function(dados){
+converterFatorParaCaracter <- function(dados) {
   return (as.character(levels(dados))[dados])
 }

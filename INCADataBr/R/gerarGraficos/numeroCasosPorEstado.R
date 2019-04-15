@@ -16,7 +16,7 @@ numeroCasosPorEstado <- function(dfDados, ...) {
         type = params$type
       ) %>%
       layout(
-        title = params$titleGraphic,
+        title = params$title,
         xaxis = list(title = params$titleX),
         yaxis = list(title =  params$titleY)
       )

@@ -1,11 +1,4 @@
-# Funções utilizadas por esta função
-# lerArquivoDBF
-# converterFatorParaInteiro
-# calcularPercentual
-# tratarParametros
-# lerArquivoDBF
-
-numeroCasosPorSexoPizza <- function(dfDados, ...) {
+numeroCasosPorSexo <- function(dfDados, ...) {
   library(plotly)
 
   params <- tratarParametros(...)

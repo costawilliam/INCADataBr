@@ -25,7 +25,7 @@ numeroCasosPorRacaCor <- function(dfDados, ...) {
         type = params$type
       ) %>%
       layout(
-        title = params$titleGraphic,
+        title = params$title,
         xaxis = list(title = params$titleX),
         yaxis = list(title =  params$titleY)
       )
@@ -63,7 +63,6 @@ numeroCasosPorRacaCor <- function(dfDados, ...) {
           colors = params$colors,
           line = list(color = '#FFFFFF', width = 1)
         ),
-        #The 'pull' attribute can also be used to create space between the sectors
         showlegend = TRUE
       ) %>%
       layout(

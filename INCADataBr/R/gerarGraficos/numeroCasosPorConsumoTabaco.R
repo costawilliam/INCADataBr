@@ -8,6 +8,8 @@ numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
               list(TABAGISM = dfDados$TABAGISM),
               length)
 
+  df <- subset(df, df$TABAGISM != 0)
+
   df$TABAGISM <- converterFatorParaInteiro(df$TABAGISM)
 
   df$TABAGISM[df$TABAGISM == 1] <- "Nunca"
@@ -26,7 +28,7 @@ numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
         type = params$type
       ) %>%
       layout(
-        title = params$titleGraphic,
+        title = params$title,
         xaxis = list(title = params$titleX),
         yaxis = list(title =  params$titleY)
       )
@@ -63,7 +65,6 @@ numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
           colors = params$colors,
           line = list(color = '#FFFFFF', width = 1)
         ),
-        #The 'pull' attribute can also be used to create space between the sectors
         showlegend = TRUE
       ) %>%
       layout(
