@@ -63,5 +63,9 @@ tratarParametros <- function (...) {
       )
   }
 
+  if (is.null(params$groups)) {
+    params$groups <- 0
+  }
+
   return (params)
 }
