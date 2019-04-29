@@ -8,7 +8,13 @@ numeroCasosPorLocalizacaoPrimaria <- function(dfDados, ...) {
               list(LOCTUDET = dfDados$LOCTUDET),
               length)
 
-  df$LOCTUDET <- converterFatorParaCaracter(df$LOCTUDET)
+  typeof(df$LOCTUDET)
+
+  if(typeof(df$LOCTUDET) == "integer") {
+    df$LOCTUDET <- converterFatorParaCaracter(df$LOCTUDET)
+  }
+
+  #df$LOCTUDET <- converterFatorParaCaracter(df$LOCTUDET)
 
   df$LOCTUDET[df$LOCTUDET == "C00"] <-
     "C00 - Neoplasia Maligna do Lábio"
