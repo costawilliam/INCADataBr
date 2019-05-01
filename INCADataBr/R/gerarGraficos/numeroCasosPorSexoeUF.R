@@ -3,15 +3,14 @@ numeroCasosPorSexoeUF <- function(dfDados, ...) {
 
   params <- tratarParametros(...)
 
-  df <- count(dfDados, vars = c("SEXO", "UFUH"))
 
-  df$SEXO <- converterFatorParaInteiro(df$SEXO)
+  df <- count(dfDados2, vars = c("SEXO", "UFUH"))
+
   df$SEXO[df$SEXO == 1] <- "Masculino"
   df$SEXO[df$SEXO == 2] <- "Feminino"
 
   casosMasculinos <-  subset(df, df$SEXO == "Masculino")
   casosFemininos  <-  subset(df, df$SEXO == "Feminino")
-
 
   if (params$type == "bar") {
     UFUH <- df$UFUH
@@ -31,9 +30,9 @@ numeroCasosPorSexoeUF <- function(dfDados, ...) {
       ) %>%
       add_trace(y = ~ nroMulheres, name = 'Mulheres') %>%
       layout(
-        title = params$title,
-        xaxis = list(title = params$titleX),
-        yaxis = list(title =  params$titleY),
+        #title = params$title,
+        #xaxis = list(title = params$titleX),
+        #yaxis = list(title =  params$titleY),
         barmode = 'stack'
       )
 

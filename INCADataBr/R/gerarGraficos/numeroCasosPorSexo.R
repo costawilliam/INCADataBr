@@ -4,78 +4,18 @@ numeroCasosPorSexo <- function(dfDados, ...) {
   params <- tratarParametros(...)
 
   df <-
-    aggregate(data.frame(Quantidade = dfDados$SEXO),
-              list(SEXO = dfDados$SEXO),
+    aggregate(data.frame(NroCasos = dfDados$SEXO),
+              list(VAR = dfDados$SEXO),
               length)
 
-  df$SEXO <- converterFatorParaInteiro(df$SEXO)
-  df$SEXO[df$SEXO == 1] <- "Masculino"
-  df$SEXO[df$SEXO == 2] <- "Feminino"
+  df$VAR[df$VAR == 1] <- "Masculino"
+  df$VAR[df$VAR == 2] <- "Feminino"
 
   if (params$type == "bar") {
-    p <-
-      plot_ly(
-        df,
-        x = ~ df$SEXO,
-        y = ~ df$Quantidade,
-        type = params$type
-      ) %>%
-      layout(
-        title = params$title,
-        xaxis = list(title = params$titleX),
-        yaxis = list(title =  params$titleY)
-      )
-    p
+    plotGraficoBarras(df, params)
   } else if (params$type == "pie") {
-    df["FREQUENCIA"] <- NA
-
-    for (i in c(1:nrow(df))) {
-      df$FREQUENCIA[i] = calcularPercentual(nrow(dfDados), df$Quantidade[i])
-    }
-
-    colors <-
-      c(
-        'rgb(211,94,96)',
-        'rgb(128,133,133)',
-        'rgb(144,103,167)',
-        'rgb(171,104,87)',
-        'rgb(114,147,203)'
-      )
-
-    p <-
-      plot_ly(
-        df,
-        labels = ~ df$SEXO,
-        values = ~ df$FREQUENCIA,
-        type = 'pie',
-        textposition = 'inside',
-        textinfo = 'label+percent',
-        insidetextfont = list(color = '#FFFFFF'),
-        hoverinfo = 'text',
-        text = ~ paste(df$SEXO, ' - ', df$FREQUENCIA, '%'),
-        marker = list(
-          colors = colors,
-          line = list(color = '#FFFFFF', width = 1)
-        ),
-        showlegend = TRUE
-      ) %>%
-      layout(
-        title = params$title,
-        xaxis = list(
-          showgrid = FALSE,
-          zeroline = FALSE,
-          showticklabels = FALSE
-        ),
-        yaxis = list(
-          showgrid = FALSE,
-          zeroline = FALSE,
-          showticklabels = FALSE
-        )
-      )
-    p
+    plotGraficoPizza(df, params)
   } else {
-    message("Tipo de gráfico não indicado não é suportado por esta função")
-    message("Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")
+    message("Tipo de gráfico indicado não é suportado por esta função. Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")
   }
-
 }

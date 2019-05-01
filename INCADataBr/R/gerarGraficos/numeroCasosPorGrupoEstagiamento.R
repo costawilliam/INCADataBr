@@ -5,91 +5,28 @@ numeroCasosPorGrupoEstagiamento <- function(dfDados, ...) {
 
   df <-
     aggregate(data.frame(NroCasos = dfDados$ESTADIAG),
-              list(ESTADIAG = dfDados$ESTADIAG),
+              list(VAR = dfDados$ESTADIAG),
               length)
 
-  df$ESTADIAG <- converterFatorParaCaracter(df$ESTADIAG)
-
-  df$ESTADIAG[df$ESTADIAG == "0"] <- "0"
-  df$ESTADIAG[df$ESTADIAG == "1"] <- "1"
-  df$ESTADIAG[df$ESTADIAG == "2"] <- "2"
-  df$ESTADIAG[df$ESTADIAG == "3"] <- "3"
-  df$ESTADIAG[df$ESTADIAG == "4"] <- "4"
-  df$ESTADIAG[df$ESTADIAG == "8"] <- "8"
-  df$ESTADIAG[df$ESTADIAG == "9"] <- "9"
-  df$ESTADIAG[df$ESTADIAG == "A"] <- "A"
-  df$ESTADIAG[df$ESTADIAG == "B"] <- "B"
-  df$ESTADIAG[df$ESTADIAG == "C"] <- "C"
-  df$ESTADIAG[df$ESTADIAG == "D"] <- "D"
-  df$ESTADIAG[df$ESTADIAG == "Z"] <- "Z"
-
+  df$VAR[df$VAR == "0"] <- "0"
+  df$VAR[df$VAR == "1"] <- "1"
+  df$VAR[df$VAR == "2"] <- "2"
+  df$VAR[df$VAR == "3"] <- "3"
+  df$VAR[df$VAR == "4"] <- "4"
+  df$VAR[df$VAR == "8"] <- "8"
+  df$VAR[df$VAR == "9"] <- "9"
+  df$VAR[df$VAR == "A"] <- "A"
+  df$VAR[df$VAR == "B"] <- "B"
+  df$VAR[df$VAR == "C"] <- "C"
+  df$VAR[df$VAR == "D"] <- "D"
+  df$VAR[df$VAR == "Z"] <- "Z"
 
   if (params$type == "bar") {
-    p <-
-      plot_ly(
-        df,
-        x = ~ df$ESTADIAG,
-        y = ~ df$NroCasos,
-        type = params$type
-      ) %>%
-      layout(
-        title = params$title,
-        xaxis = list(title = params$titleX),
-        yaxis = list(title =  params$titleY)
-      )
-
-    p
-
+    plotGraficoBarras(df, params)
   } else if (params$type == "pie") {
-    df["FREQUENCIA"] <- NA
-
-    for (i in c(1:nrow(df))) {
-      df$FREQUENCIA[i] = calcularPercentual(nrow(dfDados), df$NroCasos[i])
-    }
-
-    params$colors <-
-      c(
-        'rgb(211,94,96)',
-        'rgb(128,133,133)',
-        'rgb(144,103,167)',
-        'rgb(171,104,87)',
-        'rgb(114,147,203)',
-        'rgb(0,0,0)'
-      )
-    p <-
-      plot_ly(
-        df,
-        labels = ~ df$ESTADIAG,
-        values = ~ df$FREQUENCIA,
-        type = 'pie',
-        textposition = 'inside',
-        textinfo = 'label+percent',
-        insidetextfont = list(color = '#FFFFFF'),
-        hoverinfo = 'text',
-        text = ~ paste(df$ESTADIAG, ' - ', df$NroCasos, ' casos'),
-        marker = list(
-          colors = params$colors,
-          line = list(color = '#FFFFFF', width = 1)
-        ),
-        showlegend = FALSE
-      ) %>%
-      layout(
-        title = params$title,
-        xaxis = list(
-          showgrid = FALSE,
-          zeroline = FALSE,
-          showticklabels = FALSE
-        ),
-        yaxis = list(
-          showgrid = FALSE,
-          zeroline = FALSE,
-          showticklabels = FALSE
-        )
-      )
-    p
+    plotGraficoPizza(df, params)
   } else {
-    message("Tipo de gráfico não indicado não é suportado por esta função")
-    message("Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")
+    message("Tipo de gráfico indicado não é suportado por esta função. Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")
   }
 
 }

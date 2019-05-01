@@ -11,9 +11,9 @@ numeroCasosPorFaixasIdade <- function(dfDados, ...) {
                 list(Idade = dfDados$IDADE),
                 length)
 
-    df <- subset(df, converterFatorParaInteiro(df$Idade) < 150)
+    df <- subset(df, df$Idade < 150)
 
-    idadeMax <-  max(converterFatorParaInteiro(df$Idade))
+    idadeMax <-  max(df$Idade)
 
     #Exibe ao usuário os grupos que serão desconsiderados
     for (i in c(1:numeroGrupos)) {
@@ -42,12 +42,12 @@ numeroCasosPorFaixasIdade <- function(dfDados, ...) {
       dfGrupos[[i]] <-
         subset(
           df,
-          converterFatorParaInteiro(df$Idade) >= params$groups[i] &
-            converterFatorParaInteiro(df$Idade) < params$groups[i + 1]
+          df$Idade >= params$groups[i] &
+            df$Idade < params$groups[i + 1]
         )
     }
     dfGrupos[[numeroGrupos]] <-
-      subset(df, converterFatorParaInteiro(df$Idade) >= params$groups[numeroGrupos])
+      subset(df, df$Idade >= params$groups[numeroGrupos])
 
     #atribui os valores iniciais das faixas
     inicio <- params$groups
