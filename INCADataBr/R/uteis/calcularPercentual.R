@@ -1,3 +1,3 @@
 calcularPercentual <- function(totalRegistros, quantidade) {
-  (quantidade * 100) / totalRegistros
+  (as.numeric(quantidade) * 100) / as.numeric(totalRegistros)
 }
