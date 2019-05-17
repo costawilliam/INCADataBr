@@ -1,19 +1,21 @@
-numeroCasosPorFaixasIdade <- function(dfDados, ...) {
-  library(plotly)
-
+numeroCasosPorFaixasidade <- function(...) {
   params <- tratarParametros(...)
+
   numeroGrupos <- length(params$groups)
+
   if (numeroGrupos < 2) {
     message("Para gerar este gráfico é necessário indicar ao menos dois grupos.")
   } else {
-    df <-
-      aggregate(data.frame(NroCasos = dfDados$IDADE),
-                list(Idade = dfDados$IDADE),
-                length)
+    query <-
+      "SELECT idade as idade, count(*) AS NroCasos from tb_inca group by idade order by idade"
 
-    df <- subset(df, df$Idade < 150)
+    df <- obterDados(query)
 
-    idadeMax <-  max(df$Idade)
+    df$idade <- as.numeric(df$idade)
+
+    df <- subset(df, df$idade < 150)
+
+    idadeMax <-  max(df$idade)
 
     #Exibe ao usuário os grupos que serão desconsiderados
     for (i in c(1:numeroGrupos)) {
@@ -36,18 +38,17 @@ numeroCasosPorFaixasIdade <- function(dfDados, ...) {
     numeroGrupos <- length(params$groups)
 
 
-    #cria datasets de acordo os os grupos informados pelo usuário
+    #cria lista de acordo os os grupos informados pelo usuário
     dfGrupos <- c()
     for (i in c(1:(numeroGrupos - 1))) {
       dfGrupos[[i]] <-
-        subset(
-          df,
-          df$Idade >= params$groups[i] &
-            df$Idade < params$groups[i + 1]
-        )
+        subset(df,
+               df$idade >= params$groups[i] &
+                 df$idade < params$groups[i + 1])
     }
+
     dfGrupos[[numeroGrupos]] <-
-      subset(df, df$Idade >= params$groups[numeroGrupos])
+      subset(df, df$idade >= params$groups[numeroGrupos])
 
     #atribui os valores iniciais das faixas
     inicio <- params$groups
@@ -60,77 +61,28 @@ numeroCasosPorFaixasIdade <- function(dfDados, ...) {
     fim[numeroGrupos] <- idadeMax
 
     #Atribui a quantidade de casos por grupo
-    quantidadePorGrupo <- c()
+    nrocasos <- c()
     for (i in c(1:length(dfGrupos))) {
-      x <- data.frame(dfGrupos[i])
-      quantidadePorGrupo[i] <- sum(x$NroCaso)
+      nrocasos[i] <- sum(data.frame(dfGrupos[i])$nrocasos)
     }
 
-    data <- data.frame(inicio, fim, quantidadePorGrupo)
+    #cria um dataset com o inicio, fim e número de casos de cada grupo
+    data <- data.frame(inicio, fim, nrocasos)
 
     #Adiciona coluna para os rótulos do gráfico
-    data$grupo <- paste("De", data$inicio, "até", data$fim, "anos")
+    data$var <- paste("De", data$inicio, "até", data$fim, "anos")
 
-    #data <- subset(data, data$quantidadePorGrupo > 0) #ver com Juliano se devo exibir colunas
-
-    print(data)
+    #remove as colunas que não serão utilizadas
+    df <- data.frame(nrocasos = data$nrocasos, var = data$var)
 
     if (params$type == "bar") {
-      p <-
-        plot_ly(
-          df,
-          x = ~ data$grupo,
-          y = ~ data$quantidadePorGrupo,
-          type = params$type
-        ) %>%
-        layout(
-          title = params$title,
-          xaxis = list(title = params$titleX),
-
-          yaxis = list(title = params$titleY)
-        )
-      p
+      plotGraficoBarras(df, params)
     } else if (params$type == "pie") {
-      df["FREQUENCIA"] <- NA
-
-      for (i in c(1:nrow(data))) {
-        data$FREQUENCIA[i] = calcularPercentual(nrow(dfDados), data$quantidadePorGrupo[i])
-      }
-
-      p <-
-        plot_ly(
-          data,
-          labels = ~ data$grupo,
-          values = ~ data$FREQUENCIA,
-          type = params$type,
-          textposition = 'inside',
-          textinfo = 'label+percent',
-          insidetextfont = list(color = '#FFFFFF'),
-          hoverinfo = 'text',
-          text = ~ paste(data$grupo, ' - ', data$quantidadePorGrupo, 'casos'),
-          marker = list(
-            colors = colors,
-            line = list(color = '#FFFFFF', width = 1)
-          ),
-          showlegend = TRUE
-        ) %>%
-        layout(
-          title = params$title,
-          xaxis = list(
-            showgrid = FALSE,
-            zeroline = FALSE,
-            showticklabels = FALSE
-          ),
-          yaxis = list(
-            showgrid = FALSE,
-            zeroline = FALSE,
-            showticklabels = FALSE
-          )
-        )
-      p
+      plotGraficoPizza(df, params)
     } else {
-      message("Tipo de gráfico não indicado não é suportado por esta função")
-      message("Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")
+      message(
+        "Tipo de gráfico indicado não é suportado por esta função. Tente utilizar o parÃ¢metro type como \"bar\" ou \"pie\"."
+      )
     }
   }
 }

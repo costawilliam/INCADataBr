@@ -1,21 +1,23 @@
-numeroCasosPorSexo <- function(dfDados, ...) {
-  library(plotly)
-
+numeroCasosPorSexo <- function(...) {
   params <- tratarParametros(...)
 
-  df <-
-    aggregate(data.frame(NroCasos = dfDados$SEXO),
-              list(VAR = dfDados$SEXO),
-              length)
+  query <-
+    "SELECT SEXO as VAR, count(*) AS NroCasos from tb_inca group by SEXO order by SEXO"
 
-  df$VAR[df$VAR == 1] <- "Masculino"
-  df$VAR[df$VAR == 2] <- "Feminino"
+  df <- obterDados(query)
+
+  df <- subset(df, df$var == 1 | df$var == 2)
+
+  df$var[df$var == 1] <- "Masculino"
+  df$var[df$var == 2] <- "Feminino"
 
   if (params$type == "bar") {
     plotGraficoBarras(df, params)
   } else if (params$type == "pie") {
     plotGraficoPizza(df, params)
   } else {
-    message("Tipo de gráfico indicado não é suportado por esta função. Tente utilizar o parâmetro type como \"bar\" ou \"pie\".")
+    message(
+      "Tipo de gráfico indicado não é suportado por esta função. Tente utilizar o parÃ¢metro type como \"bar\" ou \"pie\"."
+    )
   }
 }

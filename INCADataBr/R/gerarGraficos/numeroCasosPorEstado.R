@@ -1,12 +1,10 @@
-numeroCasosPorEstado <- function(dfDados, ...) {
-  library(plotly)
-
+numeroCasosPorEstado <- function(...) {
   params <- tratarParametros(...)
 
-  df <-
-    aggregate(data.frame(NroCasos = dfDados$UFUH),
-              list(VAR = dfDados$UFUH),
-              length)
+  query <-
+    "SELECT UFUH as VAR, count(*) AS NroCasos from tb_inca group by UFUH order by UFUH"
+
+  df <- obterDados(query)
 
   if (params$type == "bar") {
     plotGraficoBarras(df, params)

@@ -1,23 +1,20 @@
-lerArquivoDBF<- function(file) {
+lerArquivoDBF<- function(pathFile) {
+    print("Iniciando Tarefa...")
     out <- tryCatch(
         {
-            message("Tentando ler o arquivo...")
-            dados <-foreign::read.dbf(file)
-
+            print("   Iniciando leitura...")
+            dados <-foreign::read.dbf(pathFile)
             dados$ALCOOLIS <- converterFatorParaInteiro(dados$ALCOOLIS)
             dados$TABAGISM <- converterFatorParaInteiro(dados$TABAGISM)
             dados$IDADE <- converterFatorParaInteiro(dados$IDADE)
-            dados$ESTADIAG <- converterFatorParaCaracter(dados$ESTADIAG)
-            dados$LOCTUDET <- converterFatorParaCaracter(dados$LOCTUDET)
-            dados$RACACOR <- converterFatorParaInteiro(dados$RACACOR)
-            dados$SEXO <- converterFatorParaInteiro(dados$SEXO)
+            print("   Leitura finalizada!")
         },
         error=function(cond) {
-            message(paste("   - Houve um erro ao ler o arquivo: ", file))
+            message(paste("   - Houve um erro ao ler o arquivo: ", pathFile))
             return(NA)
         },
         finally={
-            message("Tarefa finalizada!")
+            print("Tarefa finalizada!")
         }
     )
     return(dados)

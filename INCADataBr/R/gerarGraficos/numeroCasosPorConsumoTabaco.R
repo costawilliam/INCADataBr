@@ -1,21 +1,19 @@
-numeroCasosPorConsumoTabaco <- function(dfDados, ...) {
-  library(plotly)
-
+numeroCasosPorConsumoTabaco <- function(...) {
   params <- tratarParametros(...)
 
-  df <-
-    aggregate(data.frame(NroCasos = dfDados$TABAGISM),
-              list(VAR = dfDados$TABAGISM),
-              length)
+  query <-
+    "SELECT TABAGISM as VAR, count(*) AS NroCasos from tb_inca group by TABAGISM order by TABAGISM"
 
-  df <- subset(df, df$VAR != 0)
+  df <- obterDados(query)
 
-  df$VAR[df$VAR == 1] <- "Nunca"
-  df$VAR[df$VAR == 2] <- "Ex-consumidor"
-  df$VAR[df$VAR == 3] <- "Sim"
-  df$VAR[df$VAR == 4] <- "Não avaliado"
-  df$VAR[df$VAR == 8] <- "Não se aplica"
-  df$VAR[df$VAR == 9] <- "Sem informação"
+  df <- subset(df, df$var != 0)
+
+  df$var[df$var == 1] <- "Nunca"
+  df$var[df$var == 2] <- "Ex-consumidor"
+  df$var[df$var == 3] <- "Sim"
+  df$var[df$var == 4] <- "Não avaliado"
+  df$var[df$var == 8] <- "Não se aplica"
+  df$var[df$var == 9] <- "Sem informação"
 
   if (params$type == "bar") {
     plotGraficoBarras(df, params)

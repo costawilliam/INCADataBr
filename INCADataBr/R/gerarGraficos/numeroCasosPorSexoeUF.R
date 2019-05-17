@@ -1,52 +1,54 @@
-numeroCasosPorSexoeUF <- function(dfDados, ...) {
-  library(plyr)
-
+numeroCasosPorsexoeUF <- function(...) {
   params <- tratarParametros(...)
 
+  query <-
+    "SELECT sexo as sexo, ufuh as ufuh, count(*) AS NroCasos from tb_inca group by sexo, ufuh order by sexo, ufuh "
 
-  df <- count(dfDados, vars = c("SEXO", "UFUH"))
+  df <- obterDados(query)
 
-  df$SEXO[df$SEXO == 1] <- "Masculino"
-  df$SEXO[df$SEXO == 2] <- "Feminino"
+  df <- subset(df, df$sexo  == 1 | df$sexo == 2)
 
-  casosMasculinos <-  subset(df, df$SEXO == "Masculino")
-  casosFemininos  <-  subset(df, df$SEXO == "Feminino")
+  df$sexo[df$sexo == 1] <- "Masculino"
+  df$sexo[df$sexo == 2] <- "Feminino"
+
+  casosMasculinos <-  subset(df, df$sexo == "Masculino")
+  casosFemininos  <-  subset(df, df$sexo == "Feminino")
 
   if (nrow(casosMasculinos) != nrow(casosFemininos) &&
       nrow(casosMasculinos) > nrow(casosFemininos)) {
     for (i in c(1:nrow(casosMasculinos))) {
-      if (!casosMasculinos$UFUH[i] %in% casosFemininos$UFUH) {
+      if (!casosMasculinos$ufuh[i] %in% casosFemininos$ufuh) {
         casosFemininos <-
           rbind(casosFemininos,
-                c("Feminino", casosMasculinos$UFUH[i], 0))
+                c("Feminino", casosMasculinos$ufuh[i], 0))
       }
     }
   } else if (nrow(casosMasculinos) != nrow(casosFemininos) &&
              nrow(casosMasculinos) < nrow(casosFemininos)) {
     for (i in c(1:nrow(casosFemininos))) {
-      if (!casosFemininos$UFUH[i] %in% casosMasculinos$UFUH) {
+      if (!casosFemininos$ufuh[i] %in% casosMasculinos$ufuh) {
         casosMasculinos <-
           rbind(casosMasculinos,
-                c("Masculino", casosFemininos$UFUH[i], 0))
+                c("Masculino", casosFemininos$ufuh[i], 0))
       }
     }
   }
 
-  casosFemininos <- casosFemininos[order(casosFemininos$UFUH), ]
-  casosMasculinos <- casosMasculinos[order(casosMasculinos$UFUH), ]
+  casosFemininos <- casosFemininos[order(casosFemininos$ufuh),]
+  casosMasculinos <- casosMasculinos[order(casosMasculinos$ufuh),]
 
   if (params$type == "bar") {
-    UFUH <- casosMasculinos$UFUH
-    nroHomens <- as.numeric(casosMasculinos$freq)
-    nroMulheres <- as.numeric(casosFemininos$freq)
+    ufuh <- casosMasculinos$ufuh
+    nroHomens <- as.numeric(casosMasculinos$nrocasos)
+    nroMulheres <- as.numeric(casosFemininos$nrocasos)
 
-    df <- data.frame(UFUH, nroHomens, nroMulheres)
+    df <- data.frame(ufuh, nroHomens, nroMulheres)
 
     library(plotly)
     p <-
       plot_ly(
         df,
-        x = ~ UFUH,
+        x = ~ ufuh,
         y = ~ nroHomens,
         type = 'bar',
         name = 'Homens'
@@ -62,20 +64,22 @@ numeroCasosPorSexoeUF <- function(dfDados, ...) {
     p
 
   } else if (params$type == "pie") {
-    dfDadosHomens <- subset(dfDados, dfDados$SEXO == 1)
-    dfDadosMulheres <- subset(dfDados, dfDados$SEXO == 2)
+    dfDadosHomens <- subset(df, df$sexo == "Masculino")
+    dfDadosMulheres <- subset(df, df$sexo == "Feminino")
 
-    casosMasculinos["FREQUENCIA"] <- NA
-    casosFemininos["FREQUENCIA"] <- NA
+    casosMasculinos["nrocasosUENCIA"] <- NA
+    casosFemininos["nrocasosUENCIA"] <- NA
 
     #calcular percentual casos homens
     for (i in c(1:nrow(casosMasculinos))) {
-      casosMasculinos$FREQUENCIA[i] = calcularPercentual(nrow(dfDadosHomens), casosMasculinos$freq[i])
+      casosMasculinos$nrocasosUENCIA[i] = calcularPercentual(sum(dfDadosHomens$nrocasos),
+                                                             casosMasculinos$nrocasos[i])
     }
 
     #calcular percentual casos mulheres
     for (i in c(1:nrow(casosFemininos))) {
-      casosFemininos$FREQUENCIA[i] = calcularPercentual(nrow(dfDadosMulheres), casosFemininos$freq[i])
+      casosFemininos$nrocasosUENCIA[i] = calcularPercentual(sum(dfDadosMulheres$nrocasos),
+                                                            casosFemininos$nrocasos[i])
     }
 
     colors <-
@@ -91,15 +95,15 @@ numeroCasosPorSexoeUF <- function(dfDados, ...) {
     p <- plot_ly() %>%
       add_pie(
         data = casosMasculinos,
-        labels = ~ casosMasculinos$UFUH,
-        values = casosMasculinos$freq,
+        labels = ~ casosMasculinos$ufuh,
+        values = casosMasculinos$nrocasos,
         name = "Homens",
         domain = list(row = 0, column = 0)
       ) %>%
       add_pie(
         data = casosFemininos,
-        labels = ~ UFUH,
-        values = ~ freq,
+        labels = ~ ufuh,
+        values = ~ nrocasos,
         name = "Mulheres",
         domain = list(row = 0, column = 1)
       ) %>%
